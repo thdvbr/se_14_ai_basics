@@ -45,7 +45,15 @@ def actions(board):
     """
     Returns set of all possible actions (i, j) available on the board.
     """
-    raise NotImplementedError
+    actions = set()
+    # find any cell that is empty
+    # should return set of tuples
+    for row in range(len(board)):
+        for col in range(len(board[row])):
+            if board[row][col] == EMPTY:
+                action = (row, col)
+                actions.add(action)
+    return actions
 
 
 def result(board, action):
