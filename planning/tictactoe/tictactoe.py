@@ -3,6 +3,7 @@ Tic Tac Toe Player
 """
 
 import math
+import copy
 
 X = "X"
 O = "O"
@@ -28,11 +29,11 @@ def player(board):
     countX = 0
     countO = 0
 
-    for row in range(len(board)):
-        for col in range(len(board[row])):
-            if board[row][col] == X:
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            if board[i][j] == X:
                 countX += 1
-            if board[row][col] == O:
+            if board[i][j] == O:
                 countO += 1
 
     if countX > countO:
@@ -48,10 +49,10 @@ def actions(board):
     actions = set()
     # find any cell that is empty
     # should return set of tuples
-    for row in range(len(board)):
-        for col in range(len(board[row])):
-            if board[row][col] == EMPTY:
-                action = (row, col)
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            if board[i][j] == EMPTY:
+                action = (i, j)
                 actions.add(action)
     return actions
 
@@ -60,7 +61,15 @@ def result(board, action):
     """
     Returns the board that results from making move (i, j) on the board.
     """
-    raise NotImplementedError
+    # If action is not a valid action for the board, your program should raise an exception.
+    valid_actions = actions(board)
+    if action not in valid_actions:
+        raise Exception('This is not a valid move.')
+    # The returned board state should be the board that would result from taking the original input board, and letting the player whose turn it is make their move at the cell indicated by the input action.
+    i, j = action
+    board_copy = copy.deepcopy(board)
+    board_copy[i][j] = player(board)
+    return board_copy
 
 
 def winner(board):
