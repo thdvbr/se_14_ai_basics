@@ -76,21 +76,63 @@ def winner(board):
     """
     Returns the winner of the game, if there is one.
     """
-    raise NotImplementedError
+    # winner in same row: 3 times same player on same row, not empty
+    for i in range(len(board)):
+        if board[i][0] == board[i][1] == board[i][2] != EMPTY:
+            if board[i][0] == X:
+                return X
+            else:
+                return O
+
+    # winner in same column
+    for j in range(len(board)):
+        if board[0][j] == board[1][j] == board[2][j] != EMPTY:
+            if board[0][j] == X:
+                return X
+            else:
+                return O
+
+    # winner in diagonal: 2 cases (0,0) (1,1) (2,2) or (0,2), (1,1), (2,0)
+    if board[0][0] == board[1][1] == board[2][2] != EMPTY:
+        if board[0][0] == X:
+            return X
+        else:
+            return O
+    elif board[0][2] == board[1][1] == board[2][0] != EMPTY:
+        if board[0][2] == X:
+            return X
+        else:
+            return O
+
+    # no winner / draw
+    else:
+        return None
 
 
 def terminal(board):
     """
     Returns True if game is over, False otherwise.
     """
-    raise NotImplementedError
+    # if there is a winner
+    if winner(board) != None:
+        return True
+    # if all cells have been filled (no more moves possible, empty actions)
+    elif len(actions(board)) == 0:
+        return True
+    else:
+        return False
 
 
 def utility(board):
     """
     Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
     """
-    raise NotImplementedError
+    if winner(board) == X:
+        return 1
+    elif winner(board) == O:
+        return -1
+    else:
+        return 0
 
 
 def minimax(board):
