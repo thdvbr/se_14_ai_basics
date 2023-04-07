@@ -135,8 +135,46 @@ def utility(board):
         return 0
 
 
+def max_value(board):
+    v = -math.inf
+    # 1. first check if game is over
+    if terminal(board):
+        return utility(board)
+    # 2. compare v with maximum value of minValue
+    for action in actions(board):
+        v = max(v, min_value(result(board, action)))
+    return v
+
+
+def min_value(board):
+    # initial value of the state
+    v = math.inf
+    if terminal(board):
+        return utility(board)
+    # loop over all of the possible actions
+    for action in actions(board):
+        # take the min of max players decision vs current value v
+        v = min(v, max_value(result(board, action)))
+    return v
+
+
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    raise NotImplementedError
+    # The move returned should be the optimal action (i, j) that is one of the allowable actions on the board.
+    # If multiple moves are equally optimal, any of those moves is acceptable.
+
+    # If the board is a terminal board, the minimax function should return None.
+    if terminal(board):
+        return None
+    for action in actions(board):
+        # X wants to maximize score
+        if player(board) == X:
+            # if max value of this move is min value of next move?
+            if max_value(board) == min_value(result(board, action)):
+                return action
+        # O wants to minimize score
+        else:
+            if min_value(board) == max_value(result(board, action)):
+                return action
