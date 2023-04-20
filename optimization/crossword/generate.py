@@ -193,15 +193,16 @@ class CrosswordCreator():
 
             # verify if all words different
             for var_2, word_2 in assignment.items():
-                if word_2 == word_1:
-                    return False
+                if var_2 != var_1:
+                    if word_2 == word_1:
+                        return False
 
                 # verify if there are no conflicting characters
-                overlap = self.crossword.overlaps[var_1, var_2]
-                if overlap:
-                    (i, j) = overlap  # overlap indices
-                    if word_1[i] != word_2[j]:
-                        return False
+                    overlap = self.crossword.overlaps[var_1, var_2]
+                    if overlap:
+                        (i, j) = overlap  # overlap indices
+                        if word_1[i] != word_2[j]:
+                            return False
         # assignment is consistent
         return True
 
@@ -224,28 +225,30 @@ class CrosswordCreator():
         # IF any variable present in assignment already has a value, and therefore shouldn’t be counted
         # when computing the number of values ruled out for neighboring unassigned variables.
 
-        # if a var is already in assignment remove it from neighbors
-        neighbors = self.crossword.neighbors(var)
-        for var in assignment:
-            if var in neighbors:
-                neighbors.remove(var)
-
         ruleout_count = {val: 0 for val in self.domains[var]}
 
+        # if a variable is already in assignment remove it from neighbors
+        neighbors = self.crossword.neighbors(var)
+
+        for variable in assignment:
+            if variable in neighbors:
+                neighbors.remove(variable)
+
         # ordered_domains = []
-        for val_1 in self.domains[var]:
+        for val in self.domains[var]:
             # iterate thru neighboring variables and values
             for neighbor_var in neighbors:
-                for val_2 in self.domains[neighbor_var]:
+                for neighbor_val in self.domains[neighbor_var]:
                     overlap = self.crossword.overlaps[var, neighbor_var]
                     # if val_1 rules out val_2 then increment ruleout_count
                     if overlap:
                         (i, j) = overlap
-                        if val_1[i] != val_2[j]:
-                            ruleout_count[val_1] += 1
+                        if val[i] != neighbor_val[j]:
+                            ruleout_count[val] += 1
 
         return sorted([x for x in ruleout_count],
                       key=lambda x: ruleout_count[x])
+
         # return in any order
         # return [x for x in self.domains[var]]
 
