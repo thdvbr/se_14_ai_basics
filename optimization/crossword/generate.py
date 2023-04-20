@@ -110,10 +110,10 @@ class CrosswordCreator():
 
         for var in self.domains:
             # self.domains[var] is a set
-            for word in list(self.domains[var]):
+            for val in list(self.domains[var]):
                 # self.crosswords.word:
-                if len(word) != var.length:
-                    self.domains[var].remove(word)
+                if len(val) != var.length:
+                    self.domains[var].remove(val)
 
     def revise(self, x, y):
         """
@@ -187,21 +187,21 @@ class CrosswordCreator():
         puzzle without conflicting characters); return False otherwise.
         """
         # verify if all words have correct length
-        for var_1, word_1 in assignment.items():
-            if var_1.length != len(word_1):
+        for var_1, val_1 in assignment.items():
+            if var_1.length != len(val_1):
                 return False
 
             # verify if all words different
-            for var_2, word_2 in assignment.items():
+            for var_2, val_2 in assignment.items():
                 if var_2 != var_1:
-                    if word_2 == word_1:
+                    if val_2 == val_1:
                         return False
 
                 # verify if there are no conflicting characters
                     overlap = self.crossword.overlaps[var_1, var_2]
                     if overlap:
                         (i, j) = overlap  # overlap indices
-                        if word_1[i] != word_2[j]:
+                        if val_1[i] != val_2[j]:
                             return False
         # assignment is consistent
         return True
