@@ -261,19 +261,18 @@ class CrosswordCreator():
         return values.
         """
         # returns a Variable object, that has fewest number of remaining values in its domain
-        # minimum remaining value heuristic & degree heuristic
 
         # find unassigned variables and put it in a set
         unassigned = set(self.domains.keys()) - set(assignment.keys())
 
-        # check number of remaining values in its domain and add to result
-        result = {var: 0 for var in unassigned}
+        # check number of remaining values in its domain and add to a dict
+        num_remain_val = {var: 0 for var in unassigned}
         for var in unassigned:
-            result[var] = len(self.domains[var])
+            num_remain_val[var] = len(self.domains[var])
 
-        return sorted([x for x in result],
-                      key=lambda x: result[x], reverse=False)[0]
-        # todo check highest degree
+        # sort by minimum remaining value heuristic & degree heuristic
+        return sorted([x for x in num_remain_val],
+                      key=lambda x: (len(self.domains[x]), -len(self.crossword.neighbors(x))), reverse=False)[0]
 
     def backtrack(self, assignment):
         """
