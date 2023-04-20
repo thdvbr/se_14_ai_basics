@@ -127,12 +127,12 @@ class CrosswordCreator():
         revised = False
         if overlap:
             conflict = True
-            for word_x in self.domains[x]:
-                for word_y in self.domains[y]:
-                    if word_x[i] == word_y[j]:
+            for val_x in self.domains[x]:
+                for val_y in self.domains[y]:
+                    if val_x[i] == val_y[j]:
                         conflict = False
                     if conflict:
-                        self.domains[x].remove(word_x)
+                        self.domains[x].remove(val_x)
                         revised = True
         return revised
 
@@ -211,7 +211,41 @@ class CrosswordCreator():
         The first value in the list, for example, should be the one
         that rules out the fewest values among the neighbors of `var`.
         """
-        raise NotImplementedError
+        # least constraining values heuristics
+        # variable x has words ['Egg', 'Tree', 'Sea']
+        # find neighbors of x w self.crossword.neighbors(x)
+        # then we get a variable y which has words ['Salt', 'Sun', 'Eel', 'Apple']
+        # now get the overlaps self.crossword.overlaps[x,y] = (0, 0)
+        # then check the character on index 0
+        # Egg has one, Tree has none, Sea has two
+        # return ['Sea', 'Egg', 'Tree']
+
+        # IF any variable present in assignment already has a value, and therefore shouldn’t be counted
+        # when computing the number of values ruled out for neighboring unassigned variables.
+
+        # if a var is already in assignment remove it from neighbors
+        neighbors = self.crossword.neighbors(var)
+        for var in assignment:
+            if var in neighbors:
+                neighbors.remove(var)
+
+        ruleout_count = {val: 0 for val in self.domains[var]}
+
+        # ordered_domains = []
+        for val_1 in self.domains[var]:
+            # iterate thru neighboring variables and values
+            for neighbor_var in neighbors:
+                for val_2 in self.domains[val_2]:
+                    overlap = self.crossword.overlaps[var, neighbor_var]
+                    # if val_1 rules out val_2 then increment ruleout_count
+                    if overlap:
+                        (i, j) = overlap
+                        if val_1[i] != val_2[j]:
+                            ruleout_count[val_1] += 1
+
+        return sorted([x for x in ruleout_count], key=lambda x: ruleout_count[x])
+        # return in any order
+        # return [x for x in self.domains[var]]
 
     def select_unassigned_variable(self, assignment):
         """
