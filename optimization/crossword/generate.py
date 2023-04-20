@@ -107,7 +107,9 @@ class CrosswordCreator():
         # if not then remove word from the domain of variable v
 
         # if variable length != domains variable length (word candidates)
+
         for var in self.domains:
+            # self.domains[var] is a set
             for word in list(self.domains[var]):
                 # self.crosswords.word:
                 if len(word) != var.length:
@@ -126,14 +128,14 @@ class CrosswordCreator():
         (i, j) = overlap
         revised = False
         if overlap:
-            conflict = True
-            for val_x in self.domains[x]:
+            for val_x in list(self.domains[x]):
+                conflict = True
                 for val_y in self.domains[y]:
                     if val_x[i] == val_y[j]:
                         conflict = False
-                    if conflict:
-                        self.domains[x].remove(val_x)
-                        revised = True
+                if conflict:
+                    self.domains[x].remove(val_x)
+                    revised = True
         return revised
 
     def ac3(self, arcs=None):
@@ -147,8 +149,8 @@ class CrosswordCreator():
         """
 
         # if arcs is none, initial list with all arcs
-        arcs = deque()
-        if arcs == None:
+        if arcs is None:
+            arcs = deque()
             for var1 in self.crossword.variables:
                 for var2 in self.crossword.neighbors(var1):
                     arcs.appendleft((var1, var2))
@@ -157,8 +159,7 @@ class CrosswordCreator():
             arcs = deque(arcs)
 
         while arcs:
-            x = arcs.popleft()
-            y = arcs.popleft()
+            x, y = arcs.pop()
 
             if self.revise(x, y):
                 # nothing left in domainX impossible to solve problem
@@ -235,7 +236,7 @@ class CrosswordCreator():
         for val_1 in self.domains[var]:
             # iterate thru neighboring variables and values
             for neighbor_var in neighbors:
-                for val_2 in self.domains[val_2]:
+                for val_2 in self.domains[neighbor_var]:
                     overlap = self.crossword.overlaps[var, neighbor_var]
                     # if val_1 rules out val_2 then increment ruleout_count
                     if overlap:
@@ -243,7 +244,8 @@ class CrosswordCreator():
                         if val_1[i] != val_2[j]:
                             ruleout_count[val_1] += 1
 
-        return sorted([x for x in ruleout_count], key=lambda x: ruleout_count[x])
+        return sorted([x for x in ruleout_count],
+                      key=lambda x: ruleout_count[x])
         # return in any order
         # return [x for x in self.domains[var]]
 
@@ -255,7 +257,20 @@ class CrosswordCreator():
         degree. If there is a tie, any of the tied variables are acceptable
         return values.
         """
-        raise NotImplementedError
+        # returns a Variable object, that has fewest number of remaining values in its domain
+        # minimum remaining value heuristic & degree heuristic
+
+        # find unassigned variables and put it in a set
+        unassigned = set(self.domains.keys()) - set(assignment.keys())
+
+        # check number of remaining values in its domain and add to result
+        result = {var: 0 for var in unassigned}
+        for var in unassigned:
+            result[var] = len(self.domains[var])
+
+        return sorted([x for x in result],
+                      key=lambda x: result[x], reverse=False)[0]
+        # todo check highest degree
 
     def backtrack(self, assignment):
         """
@@ -266,7 +281,25 @@ class CrosswordCreator():
 
         If no assignment is possible, return None.
         """
-        raise NotImplementedError
+        # if assignment complete return assignment
+        if self.assignment_complete(assignment):
+            return assignment
+        # select a variable from list of unassigned var
+        var = self.select_unassigned_variable(assignment)
+        # loop thru the list of domain values
+        for val in self.order_domain_values(var, assignment):
+            assignment[var] = val
+            # check if assignment is still consistent
+            if self.consistent(assignment):
+                # recursive backtracking search
+                result = self.backtrack(assignment)
+                #
+                if result:
+                    return result
+            # remove the variable from assignment because it was fail
+            assignment.pop(var)
+        # return failure
+        return None
 
 
 def main():
