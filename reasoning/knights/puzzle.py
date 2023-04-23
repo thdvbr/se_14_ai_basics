@@ -17,7 +17,10 @@ knowledgeBase = And(
     And(Or(BKnight, BKnave), Not(And(BKnight, BKnave))),
     # C is a knight or a knave but can't be both
     And(Or(CKnight, CKnave), Not(And(CKnight, CKnave))),
+    # *can also be written with biconditional logic
+    # Biconditional(AKnight, Not(AKnave)),
 )
+
 # Puzzle 0
 # A says "I am both a knight and a knave."
 knowledge0 = And(
@@ -61,7 +64,10 @@ knowledge2 = And(
 knowledge3 = And(
     knowledgeBase,
     # A says either "I am a knight." or "I am a knave.", but you don't know which.
-    # If B is a knight, it is true that A said "I am a knave"
+    Implication(AKnight, Or(AKnight, AKnave)),
+    Implication(AKnave, Not(Or(AKnight, AKnave))),
+    # If B is a knight, it is true that A said "I am a knave",
+    # and if A is a knight, A would be telling the truth if a knave, false
     Implication(BKnight, And(Implication(AKnight, AKnave),
                 Implication(AKnave, Not(AKnave)))),
     # If B is a knave, it is not true that A said A is a knave
