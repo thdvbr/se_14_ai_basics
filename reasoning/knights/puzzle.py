@@ -9,13 +9,19 @@ BKnave = Symbol("B is a Knave")
 CKnight = Symbol("C is a Knight")
 CKnave = Symbol("C is a Knave")
 
+# knowledge base from the game rule
+knowledgeBase = And(
+    # A is a knight or a knave but can't be both
+    And(Or(AKnight, AKnave), Not(And(AKnight, AKnave))),
+    # B is a knight or a knave but can't be both
+    And(Or(BKnight, BKnave), Not(And(BKnight, BKnave))),
+    # C is a knight or a knave but can't be both
+    And(Or(CKnight, CKnave), Not(And(CKnight, CKnave))),
+)
 # Puzzle 0
 # A says "I am both a knight and a knave."
 knowledge0 = And(
-    # A is a knight or a knave but can't be both
-    And(Or(AKnight, AKnave), Not(And(AKnight, AKnave))),
-    # If A is a knight, then A is not knave
-    Implication(AKnight, Not(AKnave)),
+    knowledgeBase,
     # If A is a knight, their sentence is true
     Implication(AKnight, And(AKnight, AKnave)),
     # If A  is a knave, their sentence is false
@@ -25,10 +31,7 @@ knowledge0 = And(
 # A says "We are both knaves."
 # B says nothing.
 knowledge1 = And(
-    # A is a knight or a knave but can't be both
-    And(Or(AKnight, AKnave), Not(And(AKnight, AKnave))),
-    # B is a knight or a knave but can't be both
-    And(Or(BKnight, BKnave), Not(And(BKnight, BKnave))),
+    knowledgeBase,
     # If A is a knight, their sentence is true
     Implication(AKnight, And(AKnave, BKnave)),
     # If A is a knave, their sentence is false
@@ -39,10 +42,7 @@ knowledge1 = And(
 # A says "We are the same kind."
 # B says "We are of different kinds."
 knowledge2 = And(
-    # A is a knight or a knave but can't be both
-    And(Or(AKnight, AKnave), Not(And(AKnight, AKnave))),
-    # B is a knight or a knave but can't be both
-    And(Or(BKnight, BKnave), Not(And(BKnight, BKnave))),
+    knowledgeBase,
     # If A is a knight, their sentence is true
     Implication(AKnight, Or(And(AKnave, BKnave), And(AKnight, BKnight))),
     # If A is a knave, their sentence is false
@@ -59,12 +59,8 @@ knowledge2 = And(
 # B says "C is a knave."
 # C says "A is a knight."
 knowledge3 = And(
-    # A is a knight or a knave but can't be both
-    And(Or(AKnight, AKnave), Not(And(AKnight, AKnave))),
-    # B is a knight or a knave but can't be both
-    And(Or(BKnight, BKnave), Not(And(BKnight, BKnave))),
-    # C is a knight or a knave but can't be both
-    And(Or(CKnight, CKnave), Not(And(CKnight, CKnave))),
+    knowledgeBase,
+    # A says either "I am a knight." or "I am a knave.", but you don't know which.
     # If B is a knight, it is true that A said "I am a knave"
     Implication(BKnight, And(Implication(AKnight, AKnave),
                 Implication(AKnave, Not(AKnave)))),
