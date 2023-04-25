@@ -135,27 +135,29 @@ def utility(board):
         return 0
 
 
-def max_value(board):
+def max_value(board, count):
     v = -math.inf
     # 1. first check if game is over
     if terminal(board):
-        return utility(board)
+        return utility(board), count+1
     # 2. compare v with maximum value of minValue
     for action in actions(board):
-        v = max(v, min_value(result(board, action)))
-    return v
+        best_val, count = min_value(result(board, action), count)
+        v = max(v, best_val)
+    return v, count+1
 
 
-def min_value(board):
+def min_value(board, count):
     # initial value of the state
     v = math.inf
     if terminal(board):
-        return utility(board)
+        return utility(board), count+1
     # loop over all of the possible actions
     for action in actions(board):
         # take the min of max players decision vs current value v
-        v = min(v, max_value(result(board, action)))
-    return v
+        best_val, count = max_value(result(board, action), count)
+        v = min(v, best_val)
+    return v, count+1
 
 
 def minimax(board):
@@ -174,7 +176,7 @@ def minimax(board):
     if player(board) == X:
         for action in actions(board):
             v = -math.inf
-            best_val = min_value(result(board, action))
+            best_val, count = min_value(result(board, action), 0)
             if v < best_val:
                 v = best_val
                 best_move = action
@@ -183,9 +185,10 @@ def minimax(board):
     else:
         for action in actions(board):
             v = math.inf
-            best_val = max_value(result(board, action))
+            best_val, count = max_value(result(board, action), 0)
             if v > best_val:
                 v = best_val
                 best_move = action
 
+    print(f"Number of explored states: {count}")
     return best_move
