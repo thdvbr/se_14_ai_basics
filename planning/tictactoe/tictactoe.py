@@ -168,13 +168,24 @@ def minimax(board):
     # If the board is a terminal board, the minimax function should return None.
     if terminal(board):
         return None
-    for action in actions(board):
-        # X wants to maximize score
-        if player(board) == X:
-            # if max value of this move is min value of next move?
-            if max_value(board) == min_value(result(board, action)):
-                return action
-        # O wants to minimize score
-        else:
-            if min_value(board) == max_value(result(board, action)):
-                return action
+
+    best_move = None
+    # X wants to maximize score: get the action that returns the biggest minimum value
+    if player(board) == X:
+        for action in actions(board):
+            v = -math.inf
+            best_val = min_value(result(board, action))
+            if v < best_val:
+                v = best_val
+                best_move = action
+
+    # O wants to minimize score: get the action that returns the smallest maximum value
+    else:
+        for action in actions(board):
+            v = math.inf
+            best_val = max_value(result(board, action))
+            if v > best_val:
+                v = best_val
+                best_move = action
+
+    return best_move
