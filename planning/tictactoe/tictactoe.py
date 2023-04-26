@@ -146,11 +146,10 @@ def max_value(board, alpha, beta, count):
         val, move, count = min_value(result(board, action), alpha, beta, count)
         max_eval = max(val, max_eval)
         alpha = max(alpha, val)
-        count += 1
         best_move = action
         if alpha >= beta:
             break
-    return max_eval, best_move, count
+    return max_eval, best_move, count+1
 
 
 def min_value(board, alpha, beta, count):
@@ -165,11 +164,10 @@ def min_value(board, alpha, beta, count):
         val, move, count = max_value(result(board, action), alpha, beta, count)
         min_eval = min(val, min_eval)
         beta = min(beta, val)
-        count += 1
         best_move = action
         if alpha >= beta:
             break
-    return min_eval, best_move, count
+    return min_eval, best_move, count+1
 
 
 def minimax(board):
