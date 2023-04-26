@@ -38,8 +38,11 @@ def player(board):
 
     if countX > countO:
         return O
-    else:
+    # when games not over and number of X O same
+    elif not terminal(board) and countX == countO:
         return X
+
+    return None
 
 
 def actions(board):
@@ -135,27 +138,41 @@ def utility(board):
         return 0
 
 
-def max_value(board):
-    v = -math.inf
+def max_value(board, alpha, beta, count):
+    max_eval = -math.inf
+    best_move = None
     # 1. first check if game is over
     if terminal(board):
-        return utility(board)
+        return utility(board), None, count+1
     # 2. compare v with maximum value of minValue
     for action in actions(board):
-        v = max(v, min_value(result(board, action)))
-    return v
+        val, move, count = min_value(result(board, action), alpha, beta, count)
+        if val > max_eval:
+            max_eval = val
+            best_move = action
+        alpha = max(alpha, val)
+        if alpha >= beta:
+            break
+    return max_eval, best_move, count+1
 
 
-def min_value(board):
+def min_value(board, alpha, beta, count):
     # initial value of the state
-    v = math.inf
+    min_eval = math.inf
+    best_move = None
     if terminal(board):
-        return utility(board)
+        return utility(board), None, count+1
     # loop over all of the possible actions
     for action in actions(board):
         # take the min of max players decision vs current value v
-        v = min(v, max_value(result(board, action)))
-    return v
+        val, move, count = max_value(result(board, action), alpha, beta, count)
+        if val < min_eval:
+            min_eval = val
+            best_move = action
+        beta = min(beta, val)
+        if alpha >= beta:
+            break
+    return min_eval, best_move, count+1
 
 
 def minimax(board):
@@ -168,13 +185,14 @@ def minimax(board):
     # If the board is a terminal board, the minimax function should return None.
     if terminal(board):
         return None
-    for action in actions(board):
-        # X wants to maximize score
-        if player(board) == X:
-            # if max value of this move is min value of next move?
-            if max_value(board) == min_value(result(board, action)):
-                return action
-        # O wants to minimize score
-        else:
-            if min_value(board) == max_value(result(board, action)):
-                return action
+    alpha = -math.inf
+    beta = math.inf
+    # X wants to maximize score: get the action that returns the biggest minimum value
+    if player(board) == X:
+        best_val, best_move, count = max_value(board, alpha, beta, 0)
+    # O wants to minimize score: get the action that returns the smallest maximum value
+    else:
+        best_val, best_move, count = min_value(board, alpha, beta, 0)
+
+    print(f"Number of explored states: {count}")
+    return best_move
