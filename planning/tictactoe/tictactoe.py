@@ -38,8 +38,11 @@ def player(board):
 
     if countX > countO:
         return O
-    else:
+    # when games not over and number of X O same
+    elif not terminal(board) and countX == countO:
         return X
+
+    return None
 
 
 def actions(board):
@@ -144,9 +147,10 @@ def max_value(board, alpha, beta, count):
     # 2. compare v with maximum value of minValue
     for action in actions(board):
         val, move, count = min_value(result(board, action), alpha, beta, count)
-        max_eval = max(val, max_eval)
+        if val > max_eval:
+            max_eval = val
+            best_move = action
         alpha = max(alpha, val)
-        best_move = action
         if alpha >= beta:
             break
     return max_eval, best_move, count+1
@@ -162,9 +166,10 @@ def min_value(board, alpha, beta, count):
     for action in actions(board):
         # take the min of max players decision vs current value v
         val, move, count = max_value(result(board, action), alpha, beta, count)
-        min_eval = min(val, min_eval)
+        if val < min_eval:
+            min_eval = val
+            best_move = action
         beta = min(beta, val)
-        best_move = action
         if alpha >= beta:
             break
     return min_eval, best_move, count+1
