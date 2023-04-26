@@ -139,12 +139,13 @@ def utility(board):
 
 
 def max_value(board, alpha, beta, count):
+    # initial value: worst possible val for max
     max_eval = -math.inf
     best_move = None
-    # 1. first check if game is over
+    # first check if game is over
     if terminal(board):
         return utility(board), None, count+1
-    # 2. compare v with maximum value of minValue
+    # find the highest value from the possible actions
     for action in actions(board):
         val, move, count = min_value(result(board, action), alpha, beta, count)
         if val > max_eval:
@@ -157,14 +158,14 @@ def max_value(board, alpha, beta, count):
 
 
 def min_value(board, alpha, beta, count):
-    # initial value of the state
+    # initial value: worst possible val for min
     min_eval = math.inf
     best_move = None
     if terminal(board):
         return utility(board), None, count+1
     # loop over all of the possible actions
     for action in actions(board):
-        # take the min of max players decision vs current value v
+        # find the lowest value from max players next move
         val, move, count = max_value(result(board, action), alpha, beta, count)
         if val < min_eval:
             min_eval = val
@@ -187,10 +188,10 @@ def minimax(board):
         return None
     alpha = -math.inf
     beta = math.inf
-    # X wants to maximize score: get the action that returns the biggest minimum value
+
     if player(board) == X:
         best_val, best_move, count = max_value(board, alpha, beta, 0)
-    # O wants to minimize score: get the action that returns the smallest maximum value
+
     else:
         best_val, best_move, count = min_value(board, alpha, beta, 0)
 
